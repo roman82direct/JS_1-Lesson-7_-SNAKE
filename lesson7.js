@@ -104,35 +104,31 @@ function move() {
     var snake_head_classes = snake[snake.length-1].getAttribute('class').split(' ');
 
     // Сдвиг головы
-    var new_unit;
+    var new_unit, next, edge; 
     var snake_coords = snake_head_classes[1].split('-');//преобразовали строку в массив
     var coord_y = parseInt(snake_coords[1]);
     var coord_x = parseInt(snake_coords[2]);
 
     // Определяем новую точку
     if (direction == 'x-') {
-        new_unit = document.getElementsByClassName('cell-' + (coord_y) + '-' + (coord_x - 1))[0];
-        if (new_unit == undefined) {
-            new_unit = document.getElementsByClassName('cell-' + (coord_y) + '-' + (FIELD_SIZE_X-1))[0];
-        }
+        next = document.getElementsByClassName('cell-' + coord_y + '-' + (coord_x - 1))[0];
+        edge = document.getElementsByClassName('cell-' + coord_y + '-' + (FIELD_SIZE_X-1))[0]//проверка на кромку
+        new_unit = (next == undefined) ? edge : next;
     }
     else if (direction == 'x+') {
-        new_unit = document.getElementsByClassName('cell-' + (coord_y) + '-' + (coord_x + 1))[0];
-        if (new_unit == undefined) {
-            new_unit = document.getElementsByClassName('cell-' + (coord_y) + '-' + '0')[0];
-        }
+        next = document.getElementsByClassName('cell-' + coord_y + '-' + (coord_x + 1))[0];
+        edge = document.getElementsByClassName('cell-' + coord_y + '-' + '0')[0]
+        new_unit = next == undefined ? edge : next;
     }
     else if (direction == 'y+') {
-        new_unit = document.getElementsByClassName('cell-' + (coord_y - 1) + '-' + (coord_x))[0];
-        if (new_unit == undefined) {
-            new_unit = document.getElementsByClassName('cell-' + (FIELD_SIZE_Y-1) + '-' + coord_x)[0];
-        }
+        next = document.getElementsByClassName('cell-' + (coord_y - 1) + '-' + coord_x)[0];
+        edge = document.getElementsByClassName('cell-' + (FIELD_SIZE_Y-1) + '-' + coord_x)[0];
+        new_unit = next == undefined ? edge : next;
     }
     else if (direction == 'y-') {
-        new_unit = document.getElementsByClassName('cell-' + (coord_y + 1) + '-' + (coord_x))[0];
-        if (new_unit == undefined) {
-            new_unit = document.getElementsByClassName('cell-' + '0' + '-' + coord_x)[0];
-        }
+        next = document.getElementsByClassName('cell-' + (coord_y + 1) + '-' + coord_x)[0];
+        edge = document.getElementsByClassName('cell-' + '0' + '-' + coord_x)[0];
+        new_unit = next == undefined ? edge : next;
     }
 
     // Проверки
