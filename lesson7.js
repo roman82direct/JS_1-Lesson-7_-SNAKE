@@ -134,7 +134,7 @@ function move() {
 
     // Проверки
     // 1) new_unit не часть змейки
-    // 2) Змейка не ушла за границу поля
+    // 2) Змейка не столкнулась с бомбой
     //console.log(new_unit);
     if (!isSnakeUnit(new_unit) && !haveBomb(new_unit)) {
         // Добавление новой части змейки
