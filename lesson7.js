@@ -68,6 +68,7 @@ function startGame() {
 
     snake_timer = setInterval(move, SNAKE_SPEED);//каждые 200мс запускаем функцию move
     setTimeout(createFood, 5000);
+    setTimeout(createBomb, 6000);
 }
 
 /**
@@ -104,42 +105,38 @@ function move() {
     var snake_head_classes = snake[snake.length-1].getAttribute('class').split(' ');
 
     // Сдвиг головы
-    var new_unit;
+    var new_unit, next, edge; 
     var snake_coords = snake_head_classes[1].split('-');//преобразовали строку в массив
     var coord_y = parseInt(snake_coords[1]);
     var coord_x = parseInt(snake_coords[2]);
 
     // Определяем новую точку
     if (direction == 'x-') {
-        new_unit = document.getElementsByClassName('cell-' + (coord_y) + '-' + (coord_x - 1))[0];
-        if (new_unit == undefined) {
-            new_unit = document.getElementsByClassName('cell-' + (coord_y) + '-' + (FIELD_SIZE_X-1))[0];
-        }
+        next = document.getElementsByClassName('cell-' + coord_y + '-' + (coord_x - 1))[0];
+        edge = document.getElementsByClassName('cell-' + coord_y + '-' + (FIELD_SIZE_X-1))[0];
+        new_unit = (next == undefined) ? edge : next;
     }
     else if (direction == 'x+') {
-        new_unit = document.getElementsByClassName('cell-' + (coord_y) + '-' + (coord_x + 1))[0];
-        if (new_unit == undefined) {
-            new_unit = document.getElementsByClassName('cell-' + (coord_y) + '-' + '0')[0];
-        }
+        next = document.getElementsByClassName('cell-' + coord_y + '-' + (coord_x + 1))[0];
+        edge = document.getElementsByClassName('cell-' + coord_y + '-' + '0')[0];
+        new_unit = (next == undefined) ? edge : next;
     }
     else if (direction == 'y+') {
-        new_unit = document.getElementsByClassName('cell-' + (coord_y - 1) + '-' + (coord_x))[0];
-        if (new_unit == undefined) {
-            new_unit = document.getElementsByClassName('cell-' + (FIELD_SIZE_Y-1) + '-' + coord_x)[0];
-        }
+        next = document.getElementsByClassName('cell-' + (coord_y - 1) + '-' + coord_x)[0];
+        edge = document.getElementsByClassName('cell-' + (FIELD_SIZE_Y-1) + '-' + coord_x)[0];
+        new_unit = next == undefined ? edge : next;
     }
     else if (direction == 'y-') {
-        new_unit = document.getElementsByClassName('cell-' + (coord_y + 1) + '-' + (coord_x))[0];
-        if (new_unit == undefined) {
-            new_unit = document.getElementsByClassName('cell-' + '0' + '-' + coord_x)[0];
-        }
+        next = document.getElementsByClassName('cell-' + (coord_y + 1) + '-' + coord_x)[0];
+        edge = document.getElementsByClassName('cell-' + '0' + '-' + coord_x)[0];
+        new_unit = next == undefined ? edge : next;
     }
 
     // Проверки
     // 1) new_unit не часть змейки
     // 2) Змейка не ушла за границу поля
     //console.log(new_unit);
-    if (!isSnakeUnit(new_unit)) {
+    if (!isSnakeUnit(new_unit) && !haveBomb(new_unit)) {
         // Добавление новой части змейки
         new_unit.setAttribute('class', new_unit.getAttribute('class') + ' snake-unit');
         snake.push(new_unit);
@@ -187,11 +184,22 @@ function haveFood(unit) {
     if (unit_classes.includes('food-unit')) {
         check = true;
         createFood();
+        setTimeout(createBomb, 1000);
 
         score++;
         document.getElementsByClassName('score')[0].innerHTML = 'Счёт: ' + score;
     }
     return check;
+}
+// проверка на бомбы
+function haveBomb(unit) {
+   var check = false;
+   var unit_classes = unit.getAttribute('class').split(' ');
+
+   if (unit_classes.includes('bomb-unit')) {
+       check = true;
+   }
+   return check;
 }
 
 /**
@@ -219,6 +227,28 @@ function createFood() {
             foodCreated = true;
         }
     }
+}
+
+// Создание бомб
+function createBomb() {
+   var bombCreated = false;
+
+   while (!bombCreated) { 
+       var bomb_x = Math.floor(Math.random() * FIELD_SIZE_X);
+       var bomb_y = Math.floor(Math.random() * FIELD_SIZE_Y);
+
+       var bomb_cell = document.getElementsByClassName('cell-' + bomb_y + '-' + bomb_x)[0];
+       var bomb_cell_classes = bomb_cell.getAttribute('class').split(' ');
+
+       if (!bomb_cell_classes.includes('snake-unit')) {
+           var classes = '';
+           for (var i = 0; i < bomb_cell_classes.length; i++) {
+               classes += bomb_cell_classes[i] + ' ';
+           }
+           bomb_cell.setAttribute('class', classes + 'bomb-unit');
+           bombCreated = true;
+       }
+   }
 }
 
 /**
