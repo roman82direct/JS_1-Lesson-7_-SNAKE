@@ -134,7 +134,7 @@ function move() {
 
     // Проверки
     // 1) new_unit не часть змейки
-    // 2) Змейка не ушла за границу поля
+    // 2) Змейка не столкнулась с бомбой
     //console.log(new_unit);
     if (!isSnakeUnit(new_unit) && !haveBomb(new_unit)) {
         // Добавление новой части змейки
@@ -185,6 +185,7 @@ function haveFood(unit) {
         check = true;
         createFood();
         setTimeout(createBomb, 1000);
+        setTimeout(destroyBomb, 15000);//разминируем случайную бомбу
 
         score++;
         document.getElementsByClassName('score')[0].innerHTML = 'Счёт: ' + score;
@@ -240,7 +241,7 @@ function createBomb() {
        var bomb_cell = document.getElementsByClassName('cell-' + bomb_y + '-' + bomb_x)[0];
        var bomb_cell_classes = bomb_cell.getAttribute('class').split(' ');
 
-       if (!bomb_cell_classes.includes('snake-unit')) {
+       if (!bomb_cell_classes.includes('snake-unit') && !bomb_cell_classes.includes('food-unit')) {
            var classes = '';
            for (var i = 0; i < bomb_cell_classes.length; i++) {
                classes += bomb_cell_classes[i] + ' ';
@@ -249,6 +250,13 @@ function createBomb() {
            bombCreated = true;
        }
    }
+}
+
+function destroyBomb() {
+    var bombs = document.getElementsByClassName('bomb-unit');
+        var k = Math.floor(Math.random() * (bombs.length-1));
+        var bomb_classes = bombs[k].getAttribute('class').split(' ');
+            bombs[k].className = bomb_classes[0] + ' ' + bomb_classes[1];
 }
 
 /**
